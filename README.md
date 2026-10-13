@@ -88,7 +88,7 @@ Keep client names and case-study claims out of the demo unless authorized.
 
 ## Contact and usage
 
-[Spacedrift](https://spacedrift.in) · [Project enquiries](mailto:spacedrift.contact@gmail.com)
+[Spacedrift](https://spacedrift.in) · [Project enquiries](mailto:lourdu@spacedrift.in)
 
 Copyright © 2026 Spacedrift. No open-source license is granted in this scaffold.
 Select explicit license terms before inviting public code reuse.
