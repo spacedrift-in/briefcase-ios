@@ -1,0 +1,21 @@
+name: iOS
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+jobs:
+  build-and-test:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build iOS application
+        run: >-
+          xcodebuild -project ios/SpacedriftApp/SpacedriftApp.xcodeproj
+          -scheme SpacedriftApp
+          -destination 'generic/platform=iOS'
+          -derivedDataPath "$RUNNER_TEMP/SpacedriftDerivedData"
+          -clonedSourcePackagesDirPath "$RUNNER_TEMP/SpacedriftSourcePackages"
+          -packageCachePath "$RUNNER_TEMP/SpacedriftPackageCache"
+          CODE_SIGNING_ALLOWED=NO build
+      - name: Test Swift core
+        run: swift test --package-path ios/SpacedriftCore

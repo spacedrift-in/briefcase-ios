@@ -1,94 +1,39 @@
-# Briefcase iOS
+# Spacedrift Client Approval
 
-Client approvals are buried in messages, leaving teams unclear about which version was accepted.
+Spacedrift is an iOS and FastAPI prototype for version-specific client review, change requests, approvals, and auditable history. The current SwiftUI application is a local synthetic demonstration; live service connections are not configured.
 
-**Status:** Product brief. No working application or performance claims yet.
-Built as a Spacedrift portfolio demonstration for **consultancies, studios, and professional service teams**.
+## Current status
 
-## Client demonstration
+Discovery and architecture are documented in [`docs/architecture.md`](docs/architecture.md), [`docs/open-decisions.md`](docs/open-decisions.md), and [`docs/decisions/`](docs/decisions/). The Swift package includes review rules, a URLSession API client, and a Core Data summary cache. The backend covers authenticated project scoping, decision recording, and audit export. A SwiftUI iOS target now demonstrates local project review, distinct synthetic roles, version-specific decisions, revisions, and a local audit history. It is not connected to the API/cache/authentication and does not upload files.
 
-Open a project → inspect a deliverable version → annotate or request changes → approve → view the audit trail.
+## Environment observed
 
-Use two synthetic accounts to request a change, upload a revision, approve that exact version, and demonstrate access isolation.
+- Swift 6.4 and Xcode 27.0 are installed, with iOS 27.0 SDKs.
+- CoreSimulator could not connect; no available simulator runtimes were discovered.
+- Python 3.13.16 is installed.
+- Docker CLI 29.8.1 is installed, but its daemon socket is unavailable.
+- `psql` and `linear` commands were not found.
+- This directory is not a Git checkout. No files existed here before this discovery.
 
-Use synthetic data, identify the demonstration as a demo, and show failure recovery
-alongside the happy path. The objective is a credible discovery conversation with a client.
+## Documentation
 
-## MVP scope
+- [Architecture and verified baseline](docs/architecture.md)
+- [Setup and environment status](docs/setup.md)
+- [Demo plan and current limitations](docs/demo.md)
+- [Open product and technical decisions](docs/open-decisions.md)
+- [Data model proposal](docs/data-model.md)
+- [API contract proposal](docs/api-contract.md)
+- [Security principles](docs/security.md)
+- [Testing plan and verified commands](docs/testing.md)
+- [Backend setup](backend/README.md)
 
-- Project timeline with versioned deliverables
-- Document capture and upload with permission handling
-- Explicit approve and request-changes actions
-- Read-only cached project summaries offline
-- Role-based access and exportable approval history
+The target acceptance date in the brief is 10 November 2026, a planning target only. Effort and delivery confidence should be estimated after product decisions, access, and a runnable foundation are available.
 
-**Outside the first release:** Android, legal electronic signatures, payment collection, and sensitive identity-document storage.
+## Current code and validation
 
-## Proposed architecture
-
-Swift, SwiftUI, local persistence; FastAPI and PostgreSQL for the shared approval record.
-
-Core entities: Workspace, Membership, Project, DeliverableVersion, Decision, AuditEvent.
-
-This stack is a starting recommendation, not an implemented system. The assigned developer
-should document alternatives and finalize the architecture before adding dependencies.
-Keep authorization server-side, validate inputs, and separate external integrations behind adapters.
-Add AI only where its benefit can be measured; review uncertain outputs rather than hiding them.
-
-## Delivery milestones
-
-| Milestone | Required evidence |
-| :--- | :--- |
-| 1 · Definition | User flow, data model, API or storage contract, and agreed acceptance criteria |
-| 2 · Vertical slice | One complete workflow on synthetic fixtures, with setup instructions |
-| 3 · Reliability | Relevant failure recovery, access checks, and meaningful automated tests |
-| 4 · Demonstration | Repeatable demo, screenshots, short walkthrough, and documented limitations |
-| 5 · Handoff | Reproducible setup, deployment or build instructions, and maintenance notes |
-
-The owner estimates effort after milestone 1. Do not promise a date before platform and integration risks are assessed.
-
-## Acceptance criteria
-
-- [ ] Approval records the immutable deliverable version and actor.
-- [ ] A new revision does not inherit the previous approval.
-- [ ] One client cannot access another client’s project by changing an ID.
-- [ ] An approval remains pending until the server confirms it.
-- [ ] Expired sessions and denied camera access have recovery paths.
-- [ ] A new developer can follow the documented setup on a clean environment.
-- [ ] Secrets and private client information are absent from code, fixtures, logs, and screenshots.
-- [ ] Loading, empty, error, and success states are implemented.
-- [ ] Primary screens use black and white, readable contrast, and consistent spacing.
-- [ ] The demo includes limitations and measured results rather than unsupported claims.
-
-## Developer handoff
-
-1. Assign a primary owner and a separate reviewer.
-2. Open a planning issue linking this brief; resolve unknowns before implementation.
-3. Record the architecture decision and create the smallest runnable vertical slice.
-4. Replace the placeholder structure with the chosen platform structure.
-5. Add actual setup commands only after verifying them; record required versions.
-6. Deliver through focused pull requests with validation evidence.
-
-No install, build, or deployment commands are provided yet because application code has not been implemented.
-Android releases require an Android toolchain; iOS builds require macOS, Xcode, and appropriate signing.
-
-## Quality and originality
-
-Implement the product from this brief. Track third-party libraries and their licenses.
-Attribute reused material and do not copy competitors’ interfaces, proprietary code, or private datasets.
-Names are working titles; trademark and package availability have not been cleared.
-Keep client names and case-study claims out of the demo unless authorized.
-
-## Repository guide
-
-- `docs/decisions/`: architecture decisions once made.
-- `docs/demo.md`: repeatable client demonstration and limitations.
-- `tests/fixtures/`: synthetic test inputs only.
-- Platform application structure: to be created by the assigned developer.
-
-## Contact and usage
-
-[Spacedrift](https://spacedrift.in) · [Project enquiries](mailto:lourdu@spacedrift.in)
-
-Copyright © 2026 Spacedrift. No open-source license is granted in this scaffold.
-Select explicit license terms before inviting public code reuse.
+- [`ios/SpacedriftApp`](ios/SpacedriftApp) contains the iOS 16+ SwiftUI target and local fixture walkthrough. The target links the local `SpacedriftCore` Swift package.
+- [`ios/SpacedriftCore`](ios/SpacedriftCore) contains domain rules, the URLSession API client, the read-only Core Data cache, and XCTest coverage.
+- The core suite passed 6 tests on macOS 14 with the documented SwiftPM cache workaround. App source syntax parsing passed. The Xcode app build did not complete: package manifest resolution is blocked by the current host's SwiftPM/Xcode sandbox and cache permissions. This does not verify a simulator build or launch.
+- The sandbox flag is required because this host cannot apply SwiftPM's subprocess sandbox. See [testing notes](docs/testing.md).
+- `cd backend && .venv/bin/python -m pytest` passed 12 tests on Python 3.13.16 using isolated SQLite fixtures. PostgreSQL integration and migrations have not been executed against a database.
+- [iOS demo walkthrough and build command](docs/demo.md)

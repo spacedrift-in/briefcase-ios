@@ -1,0 +1,28 @@
+# Swift Package Manager
+.build/
+.swiftpm/
+
+# Local environment and credentials
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+*.egg-info/
+.ruff_cache/
+.coverage
+
+# macOS / Xcode
+.DS_Store
+DerivedData/
+*.xcuserstate
+**/xcuserdata/
+/work/
+/work/DerivedData/
+/work/SourcePackages/
+/work/PackageCache/
