@@ -12,11 +12,11 @@ Discovery completed against the provided product brief and the current workspace
 | Xcode | 27.0 (`xcodebuild -version`) | iOS SDK available. |
 | iOS SDK | 27.0 (`xcodebuild -showsdks`) | SDK is installed. |
 | Simulator | `xcrun simctl list devices available` failed because CoreSimulatorService was unavailable; no runtimes discoverable | Simulator build/run and UI tests are blocked in this environment. |
-| Python | 3.13.16 | Available; backend package compatibility has not been verified. |
+| Python | 3.13.16 | Pinned backend requirements installed and all 12 backend tests passed; live PostgreSQL/OIDC compatibility is not verified. |
 | Docker | CLI 29.8.1; daemon socket unavailable | PostgreSQL container cannot currently be started. |
 | PostgreSQL CLI | `psql` not found | No local database client verified. |
-| Git | Workspace is not a repository (`git status` reports fatal: not a git repository) | No branch, history, commits, or working-tree changes exist here. |
-| Linear | No `linear` CLI; no authorized Linear connector was exposed in this task | No issue was created and no issue state is claimed. |
+| Git | The initial pasted snapshot was not a repository. The actual checkout is now `main` at `cec8db2`; see [release-candidate status](release-candidate-status.md). | Current review is tied to an actual commit. |
+| Linear | Briefcase iOS project and related issue data were available during the 2026-10-21 review. | Relevant issue state and the mismatched FieldProof demo ticket are summarized in [release-candidate status](release-candidate-status.md); no issues were changed. |
 
 Commands actually run include `git status --short --branch`, `git log -5 --oneline`, `rg --files`, `swift --version`, `xcodebuild -version`, `python3 --version`, `command -v psql`, `command -v docker`, `command -v gh`, `command -v linear`, `xcodebuild -showsdks`, `xcrun simctl list devices available`, `docker version`, `xcodebuild -list`, and `swift test --disable-sandbox` in `ios/SpacedriftCore`. Only the Swift domain test command succeeded; it does not validate the iOS application or server.
 
@@ -63,10 +63,10 @@ These are recommendations for the initial vertical slice, not implemented or sta
 ## Known risks and blockers
 
 - Existing service providers are unknown; generic OIDC and PostgreSQL configuration is implemented but cannot yet be configured or integration-tested. Private file storage is not implemented. iPad support, supported files, and audit retention also need decisions.
-- No simulator runtime/service, database daemon, or credentials/infrastructure were verified. iOS UI validation and PostgreSQL integration validation are therefore blocked locally. The app project parses and app Swift source passes syntax parsing, but the full Xcode build is blocked before compilation because Xcode could not resolve the local Swift package under current host SwiftPM/Xcode sandbox/cache restrictions.
-- Python 3.13 compatibility with the selected pinned dependency set must be validated before committing dependency choices.
+- No simulator runtime/service, database daemon, or credentials/infrastructure were verified. iOS UI validation and PostgreSQL integration validation are therefore blocked locally. The app project parses and app/core sources passed an iOS 16 type-check; the local full Xcode build is blocked before compilation by SwiftPM sandbox/cache restrictions. Hosted CI built the committed base revision; it does not cover current uncommitted edits.
+- The backend lockfile installs and tests on Python 3.13; production database and OIDC provider compatibility still need integration validation.
 - The target date is about four weeks after the discovery date; the required MVP is broad. The 8–12 engineer-week estimate is provisional and should be revisited when providers, supported files, delivery ownership, and remaining feature scope are confirmed.
-- No Git repository means reviewable changes cannot yet be committed or branched here.
+- The original pasted snapshot cannot carry reviewable Git changes; use the linked actual checkout for commits and branches.
 
 ## Initial effort and schedule outlook
 

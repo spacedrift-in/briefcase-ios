@@ -1,5 +1,13 @@
 # Testing and validation
 
+## Current release-candidate recheck (2026-10-21)
+
+The base checkout was `main` at `cec8db235c7bf912e918f59d4b20290f90f681e3`, clean before this review. The Swift core suite passed **13 tests, 0 failures** with the documented per-command sandbox option; the backend suite passed **12 tests, 0 failures**. The app and core sources passed an iOS 16 target type-check against the installed iOS 27 SDK. The core package resolved without external dependencies and built for `arm64-apple-ios16.0`.
+
+Both hosted workflows are green for that exact base SHA: [iOS run 38774565079](https://github.com/spacedrift-in/briefcase-ios/actions/runs/38774565079) ran the generic iOS app build and core tests; [Backend run 38774564990](https://github.com/spacedrift-in/briefcase-ios/actions/runs/38774564990) installed the lockfile and ran pytest. They predate this review's changes; no run or PR exists for the local branch yet. There is no separate RC tag.
+
+The local Xcode device/Simulator builds still fail before compilation at SwiftPM manifest diagnostics with `Operation not permitted`. CoreSimulatorService is unavailable. The documented API server started locally and returned 200 from `/health/live` and 503 `database_not_configured` from `/health/ready`. The device/demo walkthrough and accessibility review remain unverified. See [release-candidate status](release-candidate-status.md) for the full scope and remaining gates.
+
 ## Backend connectivity milestone (2026-10-15)
 
 - `ios/SpacedriftCore` tests passed **13 tests, 0 failures**, including seven new API client/configuration tests for health success, typed project decoding, missing auth, HTTP 503, malformed JSON, connection failure, and invalid URLs. The tests used SwiftPM's supported per-command `--disable-sandbox` flag and scratch/module caches under `/private/tmp`.
@@ -93,7 +101,7 @@ env SWIFTC_DISABLE_SANDBOX=1 \
     -I work/CoreModules ios/SpacedriftApp/Sources/SpacedriftApp.swift
 ```
 
-The package module used in this check was emitted from the four existing core source files with `swiftc` for `arm64-apple-ios16.0`. This checks SwiftUI source/type availability but is not a full Xcode app build or link. CoreSimulator still cannot connect, and no simulator runtime was discovered. Docker cannot connect to its daemon, so PostgreSQL migration execution and database integration tests remain blocked. CI workflows have not run successfully.
+The package module used in this check was emitted from the four existing core source files with `swiftc` for `arm64-apple-ios16.0`. This checks SwiftUI source/type availability but is not a full Xcode app build or link. CoreSimulator still cannot connect, and no simulator runtime was discovered. Docker cannot connect to its daemon, so PostgreSQL migration execution and database integration tests remain blocked. At the time of this historical check, CI had not run successfully; current exact-commit CI evidence is in the section above.
 
 ## Planned coverage
 

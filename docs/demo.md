@@ -25,7 +25,7 @@ xcodebuild -project ios/SpacedriftApp/SpacedriftApp.xcodeproj \
   -packageCachePath work/PackageCache CODE_SIGNING_ALLOWED=NO build
 ```
 
-The source passed a standalone iOS 16 SDK type-check. The full Xcode build was attempted but did not complete: this host cannot launch SwiftPM's manifest sandbox and cannot write Xcode's package-manifest diagnostics under the user's Library cache. The core package's six tests pass with SwiftPM's per-command `--disable-sandbox` option. Simulator run instructions cannot be verified here because CoreSimulatorService is unavailable. On a normal Xcode installation, open `ios/SpacedriftApp/SpacedriftApp.xcodeproj`, select the `SpacedriftApp` scheme and an iOS 16+ simulator, then Run.
+The app and core sources pass an iOS 16 SDK type-check, and the core package currently passes 13 tests. GitHub Actions successfully built the app for generic iOS and ran core tests for commit `cec8db2`. The local Xcode build was attempted but cannot resolve the package because this host cannot launch SwiftPM's manifest sandbox or write its diagnostics under the user's Library cache. Simulator run instructions cannot be verified here because CoreSimulatorService is unavailable. On a normal Xcode installation, open `ios/SpacedriftApp/SpacedriftApp.xcodeproj`, select the `SpacedriftApp` scheme and an iOS 16+ simulator, then Run. See [release-candidate status](release-candidate-status.md) for exact evidence and limits.
 
 ## Limitations to disclose
 

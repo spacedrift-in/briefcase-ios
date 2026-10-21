@@ -15,21 +15,21 @@ No external product or infrastructure assumptions have been treated as approved.
 | Important | What are audit retention/export format requirements and who can export? | Privacy, storage, and audit scope | Workspace-authorized JSON/CSV export; retention needs owner decision. |
 | Important | What expected dataset sizes and measurable response targets are acceptable? | Performance test design | Establish during milestone 1; no numbers invented. |
 | Important | Who is implementation owner and who reviews authorization/schema changes? | Delivery accountability | Not provided. |
-| Blocker | Is Linear tracking required and can an authorized Linear workspace connection be enabled? | Project issue and milestone tracking | No issue created; no Linear connector was exposed. |
+| Resolved for tracking | Is Linear tracking required and can project access be enabled? | Project issue and milestone tracking | Briefcase iOS is tracked as project `P-SPA-2`; see the [release-candidate status](release-candidate-status.md). No issue updates were made during this verification. |
 
 ## Environment blockers
 
 - CoreSimulatorService is unavailable and no simulator runtime could be discovered.
 - Docker daemon is unavailable; PostgreSQL is not otherwise verified.
-- No Git repository exists in this workspace.
-- No Linear integration/credentials were exposed.
-- The latest CLI Xcode build still stops at SwiftPM manifest diagnostics with `spacedriftcore.dia` `Operation not permitted`, but the current app scheme successfully built through Xcode's GUI using its existing package state. Physical-device behavior has not been manually verified for the API status view.
+- The initial pasted snapshot has no Git metadata; the actual checkout is now `main` at `cec8db2`, as recorded in [release-candidate status](release-candidate-status.md).
+- Linear project and issue details were accessible during the 2026-10-21 release-candidate review; no issue state was changed.
+- Local CLI Xcode builds stop at SwiftPM manifest diagnostics with `spacedriftcore.dia` `Operation not permitted`. Hosted iOS CI built the current commit successfully. Physical-device behavior has not been manually verified.
 
 ## Current vertical-slice boundary
 
 - The iOS target retains its local in-memory synthetic walkthrough and now uses the core URLSession client for unauthenticated `/health/live` and `/health/ready` checks. Project/timeline reads still need the selected OIDC provider and a real token/session implementation; API status does not claim authenticated access. Core Data remains unwired to the UI.
 - The app does not have production sign-in/session restoration or Keychain storage. Provider-neutral client interfaces remain unconnected pending actual issuer, audience, native client configuration, and callback details.
 - The backend currently has no file upload or download routes. A secure workflow requires the selected private storage service and server-side authorization design; the consultant revision control currently creates synthetic metadata only.
-- CI workflow definitions were added but have not run. No green CI result is claimed.
+- CI workflow definitions ran successfully for base commit `cec8db2`; no CI run exists yet for the local review branch. See [release-candidate status](release-candidate-status.md). Hosted CI does not replace interactive or physical-device verification.
 
 These blockers do not establish that external infrastructure is unavailable; they describe only this local session. User direction is to use existing services, not the local demo-service proposal.

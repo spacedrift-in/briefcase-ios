@@ -4,6 +4,8 @@
 
 The backend tests can run locally and an iOS 16+ SwiftUI target is present. The app retains its synthetic fixture workflow and now performs a configurable API liveness/readiness check. It does not fetch project data: `/api/v1/projects` is authenticated, and no identity provider, native sign-in flow, or access-token provider has been selected/configured. The local demo roles are not server identities. PostgreSQL-backed API use still requires an existing PostgreSQL endpoint and OIDC issuer/JWKS configuration; provider names and credentials have not been supplied.
 
+For the verified base commit and validation results, see [release-candidate status](release-candidate-status.md). Hosted CI built `main` at `cec8db2`; no CI run exists yet for the local release-readiness branch. Local Xcode package resolution remains blocked by this host's sandbox/cache restrictions.
+
 ## Prerequisites observed
 
 - macOS with Swift 6.4 and Xcode 27.0; iOS SDK 27.0 is installed.
