@@ -170,7 +170,8 @@ private enum StudioStyle {
     static let surfaceMuted = Color(red: 0.944, green: 0.930, blue: 0.900)
     static let ink = Color(red: 0.145, green: 0.137, blue: 0.176)
     static let secondaryInk = Color(red: 0.424, green: 0.412, blue: 0.455)
-    static let tertiaryInk = Color(red: 0.565, green: 0.545, blue: 0.576)
+    // Keep the smallest metadata labels above WCAG AA contrast on paper, surface, and muted cards.
+    static let tertiaryInk = Color(red: 0.424, green: 0.412, blue: 0.455)
     static let separator = Color(red: 0.875, green: 0.855, blue: 0.816)
     static let indigo = Color(red: 0.302, green: 0.267, blue: 0.620)
     static let indigoWash = Color(red: 0.922, green: 0.910, blue: 0.980)
