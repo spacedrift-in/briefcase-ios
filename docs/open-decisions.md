@@ -21,9 +21,9 @@ No external product or infrastructure assumptions have been treated as approved.
 
 - CoreSimulatorService is unavailable and no simulator runtime could be discovered.
 - Docker daemon is unavailable; PostgreSQL is not otherwise verified.
-- The initial pasted snapshot has no Git metadata; the actual repository checkout is `codex/briefcase-release-readiness` at `32f7fca`, as recorded in [release-candidate status](release-candidate-status.md).
+- The initial pasted snapshot has no Git metadata; the actual repository checkout is `codex/briefcase-release-readiness`, currently at `c2df608` with local app-code and verification evidence commits recorded in [release-candidate status](release-candidate-status.md).
 - Linear is connected. SPA-13–SPA-16 have 21 October audit comments and remain In Progress; the comments record incomplete work and verification limits.
-- Xcode builds succeed via the supported route outside the restricted shell. The restricted-shell SwiftPM diagnostics failure remains documented; CoreSimulatorService is unavailable. A signed build was installed and launched on iPhone 16, but interactive device use remains blocked while iPhone Mirroring is paused pending local Mac authentication.
+- Xcode generic device and Simulator builds succeed via the supported route outside the restricted shell. The restricted-shell SwiftPM diagnostics failure remains documented; CoreSimulatorService is unavailable. A signed build was installed and launched on iPhone 16, and the synthetic review/revision/approval and restricted-access flow plus relaunch reset were exercised on device. Formal accessibility/performance profiling, hosted CI for this branch, and PR review are still outstanding.
 
 ## Current vertical-slice boundary
 

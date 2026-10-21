@@ -4,7 +4,7 @@
 
 The backend tests can run locally and an iOS 16+ SwiftUI target is present. The app retains its synthetic fixture workflow and now performs a configurable API liveness/readiness check. It does not fetch project data: `/api/v1/projects` is authenticated, and no identity provider, native sign-in flow, or access-token provider has been selected/configured. The local demo roles are not server identities. PostgreSQL-backed API use still requires an existing PostgreSQL endpoint and OIDC issuer/JWKS configuration; provider names and credentials have not been supplied.
 
-For the verified release-branch commit and validation results, see [release-candidate status](release-candidate-status.md). Hosted CI built `main` at `cec8db2`; generic device and Simulator builds pass for the local release-readiness branch when Xcode runs outside the restricted shell. No CI run exists yet for that branch.
+For the verified release-branch commit and validation results, see [release-candidate status](release-candidate-status.md). Hosted CI built `main` at `cec8db2`; generic device and Simulator builds pass for the local release-readiness branch when Xcode runs outside the restricted shell. No hosted CI run exists yet for this local branch.
 
 ## Prerequisites observed
 
@@ -32,9 +32,9 @@ xcodebuild build -project ios/SpacedriftApp/SpacedriftApp.xcodeproj \
 
 In the restricted Codex shell, Xcode package resolution fails because the environment cannot launch macOS `sandbox-exec` subprocesses. Running the generic device and Simulator builds outside that shell succeeds with the commands above. Do not disable macOS security globally. See [testing](testing.md) for captured results and the precise diagnosis.
 
-Earlier restricted-shell attempts exited 74 at package resolution because Xcode could not write the SwiftPM manifest diagnostic under `~/Library/Caches/org.swift.swiftpm`. The current generic app builds succeeded outside that shell. Simulator runtime launch and physical-device installation remain unverified.
+Earlier restricted-shell attempts exited 74 at package resolution because Xcode could not write the SwiftPM manifest diagnostic under `~/Library/Caches/org.swift.swiftpm`. Generic device and Simulator builds succeeded outside that shell. CoreSimulatorService is unavailable, so no simulator runtime workflow was run. A signed build was installed and launched on the paired iPhone 16, and the synthetic approval/revision/restricted-access walkthrough plus termination/relaunch reset were exercised there. See [testing](testing.md) for the verified evidence and remaining accessibility/performance checks.
 
-For an interactive simulator run, open the project in Xcode and select the shared `SpacedriftApp` scheme with an iOS 16+ iPhone runtime. CoreSimulatorService is unavailable on this host, so simulator launch remains unverified. A signed build was installed and launched on the paired iPhone 16, but the approval workflow was not manually exercised. The app Swift source separately passed iOS 16 SDK type-checking using the local core module; that is not a substitute for interactive testing.
+For an interactive simulator run, open the project in Xcode and select the shared `SpacedriftApp` scheme with an iOS 16+ iPhone runtime. CoreSimulatorService is unavailable on this host, so simulator launch remains unverified. The synthetic approval workflow has been exercised on the paired iPhone 16; this does not replace simulator automation or formal VoiceOver/Dynamic Type review. The app Swift source separately passed iOS 16 SDK type-checking using the local core module.
 
 To verify the local package independently in this restricted environment (SwiftPM command tested successfully):
 
