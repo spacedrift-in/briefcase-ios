@@ -17,6 +17,7 @@
 
 - Follow-up verification on the release branch (`55a6975`, including `f9e04ea`): generic iOS device and generic iOS Simulator builds both succeed with Xcode when run outside the restricted shell using temporary derived-data/package-cache paths and `CODE_SIGNING_ALLOWED=NO`. They compile and link the app but do not install or launch it.
 - A signed device-specific build succeeded with the configured Apple Development identity and existing provisioning profile. It was installed and launched on the paired iPhone 16; a device screenshot showed the initial Client dashboard and local-only demo disclosure, and the app process remained running. This is a startup smoke check only; no on-device taps or full demo walkthrough were performed.
+- The primary demo account, project, version, review-status, revision, decision, feedback, and audit controls now expose stable accessibility identifiers. The updated app built, installed, and launched again on iPhone 16. This improves automation/accessibility targeting but is not a substitute for an XCUITest target or workflow execution.
 - The backend requirements from `backend/requirements.lock` were installed into a temporary Python 3.13 environment and the suite passed again: **12 tests, 0 failures**.
 
 - Before these local edits, `git status --short --branch` showed a clean `main` checkout at the base commit above.
