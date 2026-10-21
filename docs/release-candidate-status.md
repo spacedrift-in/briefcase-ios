@@ -15,6 +15,9 @@
 
 ## Checks completed
 
+- Follow-up verification on the release branch (`f9e04ea`): the generic iOS device build now succeeds with Xcode when run outside the restricted shell using temporary derived-data/package-cache paths and `CODE_SIGNING_ALLOWED=NO`. This compiles and links the app for device; it does not install or launch it.
+- The backend requirements from `backend/requirements.lock` were installed into a temporary Python 3.13 environment and the suite passed again: **12 tests, 0 failures**.
+
 - Before these local edits, `git status --short --branch` showed a clean `main` checkout at the base commit above.
 - Xcode project and app Info.plist passed `plutil -lint`; the shared scheme passed `xmllint --noout`.
 - Swift core suite: **13 tests passed, 0 failed** with SwiftPM's supported per-command `--disable-sandbox` flag.
@@ -26,7 +29,7 @@
 
 ## Remaining release gates
 
-- Local Xcode device and Simulator builds stop during SwiftPM package resolution while writing the manifest diagnostic under `~/Library/Caches/org.swift.swiftpm` (`Operation not permitted`). A harmless `sandbox-exec` probe independently fails with `sandbox_apply: Operation not permitted`. Build/cache paths directed to `/private/tmp` did not change it. No security setting was weakened. The exact-commit hosted iOS CI build passes, but local installation and launch remain unverified.
+- The ordinary restricted-shell Xcode device build still stops during SwiftPM package resolution while writing the manifest diagnostic under `~/Library/Caches/org.swift.swiftpm` (`Operation not permitted`). Running the same generic-device build outside that shell succeeded; no security setting was weakened. Simulator builds and local installation/launch remain unverified.
 - CoreSimulatorService is unavailable and no simulator runtime can be discovered. No interactive approval walkthrough, layout/accessibility pass, app termination/relaunch check, or iPhone 16 installation was completed. `devicectl` did not return in this environment.
 - The app is a synthetic, in-memory demo. It does not persist decisions after termination, upload file bytes, authenticate users, load protected project data, or create authoritative server audit records. Its UI labels the audit as local and says mutations are not sent to a server. The demo path was inspected in source and docs, not exercised interactively here.
 - Backend tests use SQLite and synthetic identity claims. A live OIDC provider, PostgreSQL migration/transaction behavior, and deployment readiness remain unverified. No production API integration or load testing is claimed.

@@ -2,11 +2,13 @@
 
 ## Current release-candidate recheck (2026-10-21)
 
+Follow-up on branch `codex/briefcase-release-readiness` at `f9e04ea`: `xcodebuild` successfully compiled and linked the app for both generic iOS device and generic iOS Simulator destinations with signing disabled when run outside the restricted shell. The backend lockfile was installed into `/private/tmp/briefcase-backend-venv`; `python -m pytest` passed **12 tests, 0 failures**. This environment still cannot launch a simulator: CoreSimulatorService is unavailable, and `devicectl list devices` did not return, so no physical iPhone install or interactive walkthrough is claimed.
+
 The base checkout was `main` at `cec8db235c7bf912e918f59d4b20290f90f681e3`, clean before this review. The Swift core suite passed **13 tests, 0 failures** with the documented per-command sandbox option; the backend suite passed **12 tests, 0 failures**. The app and core sources passed an iOS 16 target type-check against the installed iOS 27 SDK. The core package resolved without external dependencies and built for `arm64-apple-ios16.0`.
 
 Both hosted workflows are green for that exact base SHA: [iOS run 38774565079](https://github.com/spacedrift-in/briefcase-ios/actions/runs/38774565079) ran the generic iOS app build and core tests; [Backend run 38774564990](https://github.com/spacedrift-in/briefcase-ios/actions/runs/38774564990) installed the lockfile and ran pytest. They predate this review's changes; no run or PR exists for the local branch yet. There is no separate RC tag.
 
-The local Xcode device/Simulator builds still fail before compilation at SwiftPM manifest diagnostics with `Operation not permitted`. CoreSimulatorService is unavailable. The documented API server started locally and returned 200 from `/health/live` and 503 `database_not_configured` from `/health/ready`. The device/demo walkthrough and accessibility review remain unverified. See [release-candidate status](release-candidate-status.md) for the full scope and remaining gates.
+The restricted-shell Xcode device/Simulator builds still fail before compilation at SwiftPM manifest diagnostics with `Operation not permitted`; the successful generic builds above were run outside that shell without changing project security settings. CoreSimulatorService is unavailable. The documented API server started locally and returned 200 from `/health/live` and 503 `database_not_configured` from `/health/ready`. The device/demo walkthrough and accessibility review remain unverified. See [release-candidate status](release-candidate-status.md) for the full scope and remaining gates.
 
 ## Backend connectivity milestone (2026-10-15)
 

@@ -4,7 +4,7 @@
 
 The backend tests can run locally and an iOS 16+ SwiftUI target is present. The app retains its synthetic fixture workflow and now performs a configurable API liveness/readiness check. It does not fetch project data: `/api/v1/projects` is authenticated, and no identity provider, native sign-in flow, or access-token provider has been selected/configured. The local demo roles are not server identities. PostgreSQL-backed API use still requires an existing PostgreSQL endpoint and OIDC issuer/JWKS configuration; provider names and credentials have not been supplied.
 
-For the verified base commit and validation results, see [release-candidate status](release-candidate-status.md). Hosted CI built `main` at `cec8db2`; no CI run exists yet for the local release-readiness branch. Local Xcode package resolution remains blocked by this host's sandbox/cache restrictions.
+For the verified release-branch commit and validation results, see [release-candidate status](release-candidate-status.md). Hosted CI built `main` at `cec8db2`; generic device and Simulator builds pass for the local release-readiness branch when Xcode runs outside the restricted shell. No CI run exists yet for that branch.
 
 ## Prerequisites observed
 
@@ -30,9 +30,9 @@ xcodebuild build -project ios/SpacedriftApp/SpacedriftApp.xcodeproj \
   CODE_SIGNING_ALLOWED=NO
 ```
 
-In this Codex host, Xcode package resolution is blocked because the environment cannot launch macOS `sandbox-exec` subprocesses. The harmless check `sandbox-exec -p '(version 1)' /usr/bin/true` fails with `sandbox_apply: Operation not permitted`; Xcode has no supported command-line switch to disable this manifest sandbox. This is an execution-environment restriction: the standalone local package manifest resolves and the core builds with SwiftPM's per-command `--disable-sandbox`. Do not disable macOS security globally. See [testing](testing.md) for captured results and the precise diagnosis.
+In the restricted Codex shell, Xcode package resolution fails because the environment cannot launch macOS `sandbox-exec` subprocesses. Running the generic device and Simulator builds outside that shell succeeds with the commands above. Do not disable macOS security globally. See [testing](testing.md) for captured results and the precise diagnosis.
 
-After the UI redesign, the exact device build was retried on 2026-10-15. It exited 74 at package resolution: Xcode could not write the package manifest diagnostic file under `~/Library/Caches/org.swift.swiftpm` (`Operation not permitted`). The standalone iOS 16 SwiftUI type-check passed and the core suite passed 6 tests with SwiftPM's per-command `--disable-sandbox`; neither result substitutes for a full app build. The complete Xcode output is in `work/ui-redesign-xcodebuild.log`.
+Earlier restricted-shell attempts exited 74 at package resolution because Xcode could not write the SwiftPM manifest diagnostic under `~/Library/Caches/org.swift.swiftpm`. The current generic app builds succeeded outside that shell. Simulator runtime launch and physical-device installation remain unverified.
 
 For an interactive run, open the project in Xcode, select the shared `SpacedriftApp` scheme and an iOS 16+ iPhone simulator. CoreSimulatorService is unavailable on this host, so simulator launch and device installation remain unverified. The app Swift source separately passed iOS 16 SDK type-checking using the local core module; that is not a full app build.
 
