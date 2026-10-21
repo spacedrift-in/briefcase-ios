@@ -15,15 +15,15 @@ No external product or infrastructure assumptions have been treated as approved.
 | Important | What are audit retention/export format requirements and who can export? | Privacy, storage, and audit scope | Workspace-authorized JSON/CSV export; retention needs owner decision. |
 | Important | What expected dataset sizes and measurable response targets are acceptable? | Performance test design | Establish during milestone 1; no numbers invented. |
 | Important | Who is implementation owner and who reviews authorization/schema changes? | Delivery accountability | Not provided. |
-| Resolved for tracking | Is Linear tracking required and can project access be enabled? | Project issue and milestone tracking | Briefcase iOS is tracked as project `P-SPA-2`; see the [release-candidate status](release-candidate-status.md). No issue updates were made during this verification. |
+| Resolved | Is Linear tracking required and can project access be enabled? | Project issue and milestone tracking | Briefcase iOS is tracked in Linear; see the [release-candidate status](release-candidate-status.md). SPA-6 and SPA-7 are Done; SPA-13–SPA-16 remain In Progress pending completion and verification. |
 
 ## Environment blockers
 
 - CoreSimulatorService is unavailable and no simulator runtime could be discovered.
 - Docker daemon is unavailable; PostgreSQL is not otherwise verified.
-- The initial pasted snapshot has no Git metadata; the actual checkout is now `main` at `cec8db2`, as recorded in [release-candidate status](release-candidate-status.md).
-- Linear project and issue details were accessible during the 2026-10-21 release-candidate review; no issue state was changed.
-- Local CLI Xcode builds stop at SwiftPM manifest diagnostics with `spacedriftcore.dia` `Operation not permitted`. Hosted iOS CI built the current commit successfully. Physical-device behavior has not been manually verified.
+- The initial pasted snapshot has no Git metadata; the actual repository checkout is `codex/briefcase-release-readiness` at `32f7fca`, as recorded in [release-candidate status](release-candidate-status.md).
+- Linear is connected. SPA-13–SPA-16 have 21 October audit comments and remain In Progress; the comments record incomplete work and verification limits.
+- Xcode builds succeed via the supported route outside the restricted shell. The restricted-shell SwiftPM diagnostics failure remains documented; CoreSimulatorService is unavailable. A signed build was installed and launched on iPhone 16, but interactive device use remains blocked while iPhone Mirroring is paused pending local Mac authentication.
 
 ## Current vertical-slice boundary
 
