@@ -15,7 +15,7 @@
 
 ## Checks completed
 
-- Follow-up verification on the release branch (`f9e04ea`): the generic iOS device build now succeeds with Xcode when run outside the restricted shell using temporary derived-data/package-cache paths and `CODE_SIGNING_ALLOWED=NO`. This compiles and links the app for device; it does not install or launch it.
+- Follow-up verification on the release branch (`55a6975`, including `f9e04ea`): generic iOS device and generic iOS Simulator builds both succeed with Xcode when run outside the restricted shell using temporary derived-data/package-cache paths and `CODE_SIGNING_ALLOWED=NO`. They compile and link the app but do not install or launch it.
 - The backend requirements from `backend/requirements.lock` were installed into a temporary Python 3.13 environment and the suite passed again: **12 tests, 0 failures**.
 
 - Before these local edits, `git status --short --branch` showed a clean `main` checkout at the base commit above.
