@@ -34,7 +34,7 @@ In the restricted Codex shell, Xcode package resolution fails because the enviro
 
 Earlier restricted-shell attempts exited 74 at package resolution because Xcode could not write the SwiftPM manifest diagnostic under `~/Library/Caches/org.swift.swiftpm`. The current generic app builds succeeded outside that shell. Simulator runtime launch and physical-device installation remain unverified.
 
-For an interactive run, open the project in Xcode, select the shared `SpacedriftApp` scheme and an iOS 16+ iPhone simulator. CoreSimulatorService is unavailable on this host, so simulator launch and device installation remain unverified. The app Swift source separately passed iOS 16 SDK type-checking using the local core module; that is not a full app build.
+For an interactive simulator run, open the project in Xcode and select the shared `SpacedriftApp` scheme with an iOS 16+ iPhone runtime. CoreSimulatorService is unavailable on this host, so simulator launch remains unverified. A signed build was installed and launched on the paired iPhone 16, but the approval workflow was not manually exercised. The app Swift source separately passed iOS 16 SDK type-checking using the local core module; that is not a substitute for interactive testing.
 
 To verify the local package independently in this restricted environment (SwiftPM command tested successfully):
 
