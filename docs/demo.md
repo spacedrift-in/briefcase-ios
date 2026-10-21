@@ -6,6 +6,8 @@ The SwiftUI local synthetic walkthrough is implemented in `ios/SpacedriftApp`. I
 
 The current interface uses a warm editorial style with a project overview, versioned deliverable rows, a synthetic preview, version comparison, a validated feedback sheet, exact-version approval confirmation, and a chronological local activity view. The consultant can open the restricted-project fixture; the other demo roles receive an access-denied notice. Role switching remains available from the header menu. These are client-side fixtures and are not production authorization or server records.
 
+On 21 October 2026, the full walkthrough was exercised on the paired iPhone 16: the client requested changes on Version 1, the consultant created Version 2, the client approved Version 2, local activity showed both version-specific events, and the restricted account received an access-denied notice. The app was force-quit and relaunched; the in-memory demo reset to Client reviewer with Version 1 pending and no prior activity. This confirms the documented reset behavior, not durable persistence. The app UI continued to label all demo actions as local-only.
+
 ## Proposed walkthrough
 
 1. Open the app; it starts as the `Client reviewer` fixture.
