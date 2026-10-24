@@ -27,6 +27,7 @@ Discovery and architecture are documented in [`docs/architecture.md`](docs/archi
 - [Testing plan and verified commands](docs/testing.md)
 - [Release-candidate verification status](docs/release-candidate-status.md)
 - [Backend setup](backend/README.md)
+- [Supabase project setup and remaining handoffs](docs/supabase-setup.md)
 
 The target acceptance date in the brief is 10 November 2026, a planning target only. Current verification, Linear status, and remaining release gates are tracked in [release-candidate status](docs/release-candidate-status.md).
 
