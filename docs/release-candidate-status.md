@@ -6,7 +6,7 @@
 - Linear: SPA-15 is Done. SPA-13, SPA-14, and SPA-16 remain In Progress. Do not mark the latter complete until their remaining gates are verified.
 - The user approved PostgreSQL, private object storage, OIDC/RS256, Workspace Owner/Consultant upload, Client Reviewer comments/decisions, one final decision per immutable version, and PDF/images with version comments.
 - Current local verification: backend suite **15 passed**; Swift core suite **15 passed**. The `xcodebuild -list` check is blocked in this shell by unavailable CoreSimulatorService and denied writes to the user's Xcode log/DerivedData directories. Earlier hosted PR checks passed on `3c9c2dd`.
-- Supabase project `vetivgesigevfcolqpca` in Mumbai reports Healthy. The owner set its database password, but ignored `backend/.env` is absent in this checkout, so live PostgreSQL readiness and Alembic migrations have not run. Supabase Auth signing, private bucket, file routes, native sign-in, and a reachable API deployment remain unconfigured.
+- Supabase project `vetivgesigevfcolqpca` in Mumbai reports Healthy. The database password is saved in ignored `backend/.env` (mode 600); Alembic migrations are applied through `a41047ef1b6c`, and `/health/ready` returns ready. Supabase Auth signing, private bucket, file routes, native sign-in, and a reachable API deployment remain unconfigured.
 - Remaining quality/release gates include maximum upload size, export/retention policy, real OIDC account and membership provisioning, upload/download behavior, full VoiceOver/Dynamic Type/usability review, Instruments profiling, current CI for doc updates, and explicit product-owner acceptance.
 
 **Checked:** 24 October 2026

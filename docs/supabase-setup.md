@@ -13,7 +13,7 @@ On 24 October 2026, the dashboard reports the project as **Healthy**. A technica
 
 ## Database password handoff
 
-The owner has set the database password in Supabase. It is not stored in this checkout: `backend/.env` is currently absent. Do not send the password in chat. Add the same password to the ignored local file `backend/.env` and URL-encode reserved characters in `DATABASE_URL` before running migrations.
+The owner set the database password in Supabase and saved it to the ignored local file `backend/.env` through a hidden prompt. The file has owner-only permissions and is gitignored. Do not send the password in chat. The connection URL percent-encodes reserved password characters.
 
 The connection uses the project database user `postgres` and database `postgres`. The direct endpoint is `db.vetivgesigevfcolqpca.supabase.co:5432`; if the eventual backend host is IPv4-only, copy the session-pooler connection string from Supabase's **Connect** panel instead of guessing its pooler host.
 
@@ -35,4 +35,4 @@ Create a private bucket named `deliverables` after provisioning completes. The c
 
 ## Database initialization
 
-Once `backend/.env` contains the configured password, install the locked backend dependencies, apply Alembic migrations, and check `/health/ready`. The project has no application workspace memberships or sample records yet; real users will not see projects until authorized membership rows are provisioned.
+On 24 October 2026, the Alembic migrations were applied to Supabase through revision `a41047ef1b6c` (`head`), and the backend readiness check returned `{"status":"ready"}`. The project has no application workspace memberships or sample records yet; real users will not see projects until authorized membership rows are provisioned.
