@@ -5,7 +5,7 @@
 - Added authorized project/version detail reads and idempotent version-comment routes, with denied cross-project access and reviewer-role checks covered by backend tests.
 - `backend` suite: 15 tests passed using the Python 3.13 environment available from the workspace snapshot. It uses SQLite and synthetic identity claims; PostgreSQL and live OIDC remain unverified.
 - `ios/SpacedriftCore` suite: 15 tests passed, including authenticated idempotent comment submission and audit export records whose comments do not have decision IDs. This compiles and tests the client library on macOS; it does not run the iOS app.
-- The commit containing these changes has not yet been pushed, so PR CI must run on the updated head before merge.
+- Commit `8e2408d` is pushed to PR #1; all four hosted checks passed on that commit (iOS and Backend on push and pull_request).
 - PostgreSQL is user-approved as the target service, but no reachable endpoint or credentials are configured. OIDC and private-storage provider names are not present in repo config. The upload-size limit is still open.
 
 ## Current release-candidate recheck (2026-10-21)
