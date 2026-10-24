@@ -84,6 +84,20 @@ class ReviewDecision(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
 
+class VersionComment(Base):
+    __tablename__ = "version_comments"
+    __table_args__ = (
+        UniqueConstraint("actor_subject", "idempotency_key", name="uq_version_comment_actor_idempotency"),
+    )
+
+    id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), primary_key=True, default=uuid4)
+    version_id: Mapped[UUID] = mapped_column(ForeignKey("deliverable_versions.id", ondelete="RESTRICT"), index=True)
+    actor_subject: Mapped[str] = mapped_column(String(255), nullable=False)
+    body: Mapped[str] = mapped_column(Text, nullable=False)
+    idempotency_key: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
+
+
 class AuditEvent(Base):
     __tablename__ = "audit_events"
 

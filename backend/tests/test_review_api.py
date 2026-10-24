@@ -21,6 +21,7 @@ from spacedrift_api.models import (
     ReviewDecision,
     Workspace,
     WorkspaceMembership,
+    VersionComment,
 )
 
 
@@ -155,6 +156,95 @@ def test_active_workspace_membership_is_required_even_with_project_membership(
     response = api_call("GET", "/api/v1/projects")
     assert response.status_code == 200
     assert response.json() == []
+
+
+def test_project_and_version_detail_are_membership_scoped(
+    review_api: tuple[sessionmaker, UUID, UUID, UUID, UUID, UUID],
+) -> None:
+    _, project_id, version_id, _, restricted_project_id, restricted_version_id = review_api
+
+    project = api_call("GET", f"/api/v1/projects/{project_id}")
+    assert project.status_code == 200
+    assert project.json()["name"] == "Demo Project"
+
+    version = api_call("GET", f"/api/v1/versions/{version_id}")
+    assert version.status_code == 200
+    assert version.json()["id"] == str(version_id)
+    assert version.json()["review_status"] == "awaiting_review"
+
+    outsider = api_call("GET", f"/api/v1/projects/{restricted_project_id}")
+    assert outsider.status_code == 404
+    hidden_version = api_call("GET", f"/api/v1/versions/{restricted_version_id}")
+    assert hidden_version.status_code == 404
+    assert hidden_version.json()["detail"] == "version_not_found"
+
+
+def test_version_comments_are_membership_scoped_and_idempotent(
+    review_api: tuple[sessionmaker, UUID, UUID, UUID, UUID, UUID],
+) -> None:
+    factory, project_id, version_id, _, _, restricted_version_id = review_api
+    key = uuid4()
+    headers = {"Idempotency-Key": str(key)}
+    request = {"body": "  Please update the cover image.  "}
+
+    first = api_call("POST", f"/api/v1/versions/{version_id}/comments", json=request, headers=headers)
+    retry = api_call("POST", f"/api/v1/versions/{version_id}/comments", json=request, headers=headers)
+    assert first.status_code == 201
+    assert retry.status_code == 201
+    assert first.json()["id"] == retry.json()["id"]
+    assert first.json()["body"] == "Please update the cover image."
+
+    listed = api_call("GET", f"/api/v1/versions/{version_id}/comments")
+    assert listed.status_code == 200
+    assert len(listed.json()) == 1
+    with factory() as session:
+        assert len(session.scalars(select(VersionComment)).all()) == 1
+
+    exported_comments = api_call("GET", f"/api/v1/projects/{project_id}/audit-export?format=json")
+    assert exported_comments.status_code == 200
+    assert exported_comments.json()[0]["action"] == "comment"
+    assert exported_comments.json()[0]["decision_id"] is None
+
+    reused_key = api_call(
+        "POST",
+        f"/api/v1/versions/{version_id}/comments",
+        json={"body": "A different comment"},
+        headers=headers,
+    )
+    assert reused_key.status_code == 409
+
+    forbidden = api_call(
+        "POST",
+        f"/api/v1/versions/{restricted_version_id}/comments",
+        json={"body": "Should not leak"},
+        headers={"Idempotency-Key": str(uuid4())},
+    )
+    assert forbidden.status_code == 404
+    hidden_comments = api_call("GET", f"/api/v1/versions/{restricted_version_id}/comments")
+    assert hidden_comments.status_code == 404
+
+    app.dependency_overrides[current_identity] = lambda: {"sub": "consultant-a"}
+    consultant_comment = api_call(
+        "POST",
+        f"/api/v1/versions/{version_id}/comments",
+        json={"body": "Reviewer feedback"},
+        headers={"Idempotency-Key": str(uuid4())},
+    )
+    assert consultant_comment.status_code == 403
+    assert consultant_comment.json()["detail"] == "comment_not_permitted"
+
+
+def test_version_comment_rejects_blank_body(
+    review_api: tuple[sessionmaker, UUID, UUID, UUID, UUID, UUID],
+) -> None:
+    _, _, version_id, _, _, _ = review_api
+    response = api_call(
+        "POST",
+        f"/api/v1/versions/{version_id}/comments",
+        json={"body": "  "},
+        headers={"Idempotency-Key": str(uuid4())},
+    )
+    assert response.status_code == 422
 
 
 def test_approval_is_persisted_for_exact_version_with_audit_and_idempotent_retry(

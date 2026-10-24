@@ -1,6 +1,6 @@
 # Backend
 
-FastAPI service foundation for Spacedrift. It currently includes generic OIDC RS256 validation, PostgreSQL configuration, workspace/project membership models, authorized project/timeline reads, version-specific decisions, idempotency, an audit event transaction, audit JSON/CSV export, and an initial Alembic schema.
+FastAPI service foundation for Spacedrift. It currently includes generic OIDC RS256 validation, PostgreSQL configuration, workspace/project membership models, authorized project/version/timeline reads, version comments and decisions, idempotent writes, an audit event transaction, audit JSON/CSV export, and Alembic schemas.
 
 ## Install
 
@@ -32,4 +32,4 @@ Copy the repository-root `.env.example` to `backend/.env`; provide a PostgreSQL 
 
 ## Implemented routes and limits
 
-See [`../docs/api-contract.md`](../docs/api-contract.md). File upload/download, demo membership seeding, refresh/session revocation, pagination/sync cursors, and separate comments are not implemented. Do not expose this API to real users until PostgreSQL integration, provider configuration, migrations, and security review have been completed.
+See [`../docs/api-contract.md`](../docs/api-contract.md). File upload/download, demo membership seeding, refresh/session revocation, and pagination/sync cursors are not implemented. Do not expose this API to real users until PostgreSQL integration, provider configuration, migrations, file-transfer support, and security review have been completed.

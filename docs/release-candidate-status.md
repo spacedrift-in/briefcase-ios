@@ -1,5 +1,13 @@
 # Release-candidate verification status
 
+## Latest status (2026-10-24)
+
+- Review PR: [#1](https://github.com/spacedrift-in/briefcase-ios/pull/1), branch `codex/briefcase-release-readiness`, previously verified head `63debf9`. It is open for review; four GitHub checks passed on that head before the latest local API changes. Re-run CI on the updated commit before merge.
+- Linear: SPA-15 is Done with the core device walkthrough and PR link. SPA-13, SPA-14, and SPA-16 remain In Progress; see their issue notes for scope, validation, and acceptance gates.
+- The user approved the MVP defaults: PostgreSQL, private object storage, OIDC/RS256, Workspace Owner/Consultant upload, Client Reviewer comments/decisions, one final decision per immutable version, and PDF/images with version comments.
+- This update implements and tests project/version detail reads plus idempotent, reviewer-authorized version comments, included in audit export. Backend: 15 tests passed; Swift core: 15 tests passed; iOS 16 core package build passed; the PostgreSQL Alembic migration chain renders offline. These changes are still local and require a new PR CI run.
+- Remaining blockers: no existing OIDC/storage provider configuration was found; PostgreSQL availability is unverified; max upload size and audit export/retention authorization still need decisions. Upload/download routes and native sign-in are not implemented. Formal VoiceOver/Dynamic Type/usability and Instruments performance/crash profiling remain incomplete; product-owner release acceptance is not recorded.
+
 **Checked:** 21 October 2026  
 **Target acceptance date:** 10 November 2026  
 **Status:** Validation is in progress; explicit stakeholder acceptance has not been recorded.

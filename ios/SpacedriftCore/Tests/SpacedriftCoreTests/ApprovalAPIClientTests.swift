@@ -32,6 +32,48 @@ final class ApprovalAPIClientTests: XCTestCase {
         XCTAssertEqual(projects, [ProjectSummary(id: projectID, name: "Northstar", summary: "Brand system")])
     }
 
+    func testVersionCommentsUseAuthenticatedIdempotentMutation() async throws {
+        let versionID = UUID()
+        let commentID = UUID()
+        let key = UUID()
+        StubURLProtocol.handlers.set { request in
+            XCTAssertEqual(request.url?.path, "/api/v1/versions/\(versionID.uuidString)/comments")
+            XCTAssertEqual(request.httpMethod, "POST")
+            XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"), "Bearer test-access-token")
+            XCTAssertEqual(request.value(forHTTPHeaderField: "Idempotency-Key"), key.uuidString)
+            let requestBody = Self.bodyData(from: request)
+            XCTAssertEqual(try JSONSerialization.jsonObject(with: requestBody) as? [String: String], ["body": "Please update the cover image."])
+            let body = "{\"id\":\"\(commentID.uuidString)\",\"version_id\":\"\(versionID.uuidString)\",\"actor_subject\":\"reviewer-1\",\"body\":\"Please update the cover image.\",\"created_at\":\"2026-10-24T10:00:00Z\"}"
+            return Self.response(status: 201, body: body)
+        }
+
+        let comment = try await Self.client(tokenProvider: TestTokenProvider()).addComment(
+            versionID: versionID,
+            body: "Please update the cover image.",
+            idempotencyKey: key
+        )
+        XCTAssertEqual(comment.id, commentID)
+        XCTAssertEqual(comment.versionID, versionID)
+        XCTAssertEqual(comment.body, "Please update the cover image.")
+    }
+
+    func testAuditExportDecodesCommentRecordsWithoutDecisionIDs() async throws {
+        let eventID = UUID()
+        let versionID = UUID()
+        StubURLProtocol.handlers.set { request in
+            XCTAssertEqual(request.url?.path, "/api/v1/projects/\(UUID(uuidString: "A115A11A-0090-4E1B-A305-401E73000001")!.uuidString)/audit-export")
+            XCTAssertEqual(request.url?.query, "format=json")
+            let body = "[{\"event_id\":\"\(eventID.uuidString)\",\"decision_id\":null,\"version_id\":\"\(versionID.uuidString)\",\"actor_subject\":\"reviewer-1\",\"action\":\"comment\",\"comment\":\"Please update the cover image.\",\"created_at\":\"2026-10-24T10:00:00Z\"}]"
+            return Self.response(status: 200, body: body)
+        }
+
+        let projectID = UUID(uuidString: "A115A11A-0090-4E1B-A305-401E73000001")!
+        let records = try await Self.client(tokenProvider: TestTokenProvider()).audit(projectID: projectID)
+        XCTAssertEqual(records.count, 1)
+        XCTAssertEqual(records[0].decisionID, nil)
+        XCTAssertEqual(records[0].action, "comment")
+    }
+
     func testMissingAuthenticationDoesNotSendProtectedRequest() async {
         StubURLProtocol.handlers.set { _ in
             XCTFail("Protected endpoint should not be contacted without a token provider")
@@ -110,6 +152,22 @@ final class ApprovalAPIClientTests: XCTestCase {
             headerFields: ["Content-Type": "application/json"]
         )!
         return (response, Data(body.utf8))
+    }
+
+    private static func bodyData(from request: URLRequest) -> Data {
+        if let body = request.httpBody { return body }
+        guard let stream = request.httpBodyStream else { return Data() }
+        stream.open()
+        defer { stream.close() }
+        let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: 1_024)
+        defer { buffer.deallocate() }
+        var data = Data()
+        while stream.hasBytesAvailable {
+            let count = stream.read(buffer, maxLength: 1_024)
+            if count <= 0 { break }
+            data.append(buffer, count: count)
+        }
+        return data
     }
 }
 

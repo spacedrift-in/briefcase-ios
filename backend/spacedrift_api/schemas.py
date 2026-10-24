@@ -38,9 +38,21 @@ class DecisionResponse(BaseModel):
     created_at: datetime
 
 
+class CommentRequest(BaseModel):
+    body: str = Field(min_length=1, max_length=4000)
+
+
+class CommentResponse(BaseModel):
+    id: UUID
+    version_id: UUID
+    actor_subject: str
+    body: str
+    created_at: datetime
+
+
 class AuditRecord(BaseModel):
     event_id: UUID
-    decision_id: UUID
+    decision_id: UUID | None
     version_id: UUID
     actor_subject: str
     action: str

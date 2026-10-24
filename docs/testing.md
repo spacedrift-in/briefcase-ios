@@ -1,5 +1,13 @@
 # Testing and validation
 
+## Current release-candidate recheck (2026-10-24)
+
+- Added authorized project/version detail reads and idempotent version-comment routes, with denied cross-project access and reviewer-role checks covered by backend tests.
+- `backend` suite: 15 tests passed using the Python 3.13 environment available from the workspace snapshot. It uses SQLite and synthetic identity claims; PostgreSQL and live OIDC remain unverified.
+- `ios/SpacedriftCore` suite: 15 tests passed, including authenticated idempotent comment submission and audit export records whose comments do not have decision IDs. This compiles and tests the client library on macOS; it does not run the iOS app.
+- The commit containing these changes has not yet been pushed, so PR CI must run on the updated head before merge.
+- PostgreSQL is user-approved as the target service, but no reachable endpoint or credentials are configured. OIDC and private-storage provider names are not present in repo config. The upload-size limit is still open.
+
 ## Current release-candidate recheck (2026-10-21)
 
 Follow-up on branch `codex/briefcase-release-readiness` at docs-only commit `5151d10`: `xcodebuild` successfully compiled and linked the app for generic iOS device and generic iOS Simulator destinations with signing disabled when run outside the restricted shell. The Swift core suite passed **13 tests, 0 failures** and the backend suite passed **12 tests, 0 failures**. On the paired iPhone 16, the full synthetic approval walkthrough was exercised: Version 1 change request, consultant-created Version 2, client approval of that exact version, local audit inspection, and restricted-project denial. Force-quit and relaunch returned to the initial Client/Version 1 pending state, confirming that demo state is in-memory and not persistent. CoreSimulatorService is unavailable, so no simulator runtime workflow could be run.
