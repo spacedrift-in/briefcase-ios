@@ -23,7 +23,7 @@ The following provisional MVP defaults were explicitly approved by the user on 2
 - Docker daemon is unavailable; PostgreSQL was verified through the configured Supabase service and `/health/ready` returned 200.
 - The initial pasted snapshot has no Git metadata; the actual repository checkout is `codex/briefcase-release-readiness`, linked to PR #1; see [release-candidate status](release-candidate-status.md).
 - Linear is connected. SPA-15 is Done (24 Oct); SPA-13, SPA-14, and SPA-16 remain In Progress with their outstanding gates recorded in Linear.
-- Xcode generic device and Simulator builds and a signed iPhone 16 walkthrough succeeded earlier outside the restricted shell. CoreSimulatorService is currently unavailable. Four hosted PR checks passed on head `63debf9`; CI must rerun for the current documentation changes. Formal accessibility/performance profiling and PR review are outstanding.
+- Xcode generic device and Simulator builds and a signed iPhone 16 walkthrough succeeded earlier outside the restricted shell. CoreSimulatorService is currently unavailable. Four hosted PR checks passed on exact PR head `8d627ce`; a documentation-only follow-up is awaiting its own CI run. Formal accessibility/performance profiling and PR review are outstanding.
 
 ## Current vertical-slice boundary
 
