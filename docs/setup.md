@@ -2,7 +2,7 @@
 
 ## Current status
 
-The backend tests can run locally and an iOS 16+ SwiftUI target is present. The app retains its synthetic fixture workflow and now performs a configurable API liveness/readiness check. It does not fetch project data: `/api/v1/projects` is authenticated, and no identity provider, native sign-in flow, or access-token provider has been selected/configured. The local demo roles are not server identities. PostgreSQL-backed API use still requires an existing PostgreSQL endpoint and OIDC issuer/JWKS configuration; provider names and credentials have not been supplied.
+The backend tests can run locally and an iOS 16+ SwiftUI target is present. The app retains its clearly labeled synthetic fixture workflow and performs configurable API liveness/readiness checks. Supabase PostgreSQL is migrated and reachable, Supabase Auth uses an RSA-2048 RS256 key, and a private `deliverables` bucket is configured. The app still does not fetch protected project data: there is no native sign-in/session provider, provisioned workspace membership, deployed API URL, or server file endpoint. Local demo roles are not server identities.
 
 For the verified release-branch commit and validation results, see [release-candidate status](release-candidate-status.md). Hosted CI built `main` at `cec8db2`; generic device and Simulator builds pass for the local release-readiness branch when Xcode runs outside the restricted shell. No hosted CI run exists yet for this local branch.
 
@@ -80,7 +80,7 @@ python3 -m venv .venv
 .venv/bin/python -m pytest
 ```
 
-To run the API locally, copy the repository-root `.env.example` to `backend/.env`, fill in existing PostgreSQL and OIDC settings, then run `.venv/bin/alembic upgrade head` and `.venv/bin/uvicorn spacedrift_api.main:app --host 0.0.0.0 --port 8000`. These live service steps depend on valid services and have not been verified against them. The current backend tests can run without those services.
+To run the API locally, copy the repository-root `.env.example` to `backend/.env`, supply the database password through a private local configuration, then run `.venv/bin/alembic upgrade head` and `.venv/bin/uvicorn spacedrift_api.main:app --host 0.0.0.0 --port 8000`. The project-specific issuer/audience/JWKS and private bucket settings are documented in [Supabase setup](supabase-setup.md). A local `/health/ready` check against the configured Supabase database returned ready. The current backend tests can run without external services.
 
 ## API milestone
 

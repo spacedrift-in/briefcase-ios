@@ -1,12 +1,20 @@
 # Testing and validation
 
+## Supabase integration recheck (2026-10-24)
+
+- Supabase Auth was rotated to an RSA-2048 current signing key. The published JWKS endpoint was opened and returned the current RS256 RSA key plus the previous ECC key. Previous signing keys were not revoked.
+- The `deliverables` bucket is private and allows PDF/JPEG/PNG/HEIC up to 25 MB. It has no client access policies; there are still no backend file routes.
+- The local ignored `backend/.env` now has OIDC issuer/audience/JWKS values and the public Supabase URL/bucket configuration. The database password remains unchanged and is not printed or committed.
+- Live `/health/ready` returned **200** `{"status":"ready"}` using the Supabase PostgreSQL connection. This verifies database reachability only; it does not verify protected API auth or an iOS session.
+- Current rerun: backend suite **15 passed**; Swift core suite **15 passed**; the core package built for `arm64-apple-ios16.0`. Direct `xcodebuild -list` remains blocked by a mismatched CoreSimulator framework and inability to write Xcode package caches in this shell.
+
 ## Current release-candidate recheck (2026-10-24)
 
 - Added authorized project/version detail reads and idempotent version-comment routes, with denied cross-project access and reviewer-role checks covered by backend tests.
 - `backend` suite: 15 tests passed using the Python 3.13 environment available from the workspace snapshot. It uses SQLite and synthetic identity claims; PostgreSQL and live OIDC remain unverified.
 - `ios/SpacedriftCore` suite: 15 tests passed, including authenticated idempotent comment submission and audit export records whose comments do not have decision IDs. This compiles and tests the client library on macOS; it does not run the iOS app.
 - Commit `8e2408d` is pushed to PR #1; all four hosted checks passed on that commit (iOS and Backend on push and pull_request).
-- PostgreSQL is user-approved as the target service, but no reachable endpoint or credentials are configured. OIDC and private-storage provider names are not present in repo config. The upload-size limit is still open.
+- Supabase PostgreSQL is reachable and migrated. RS256 signing and the private 25 MB Storage bucket are configured, but no application user/membership is provisioned, the iOS app has no native session provider, and the API has no deployment URL or storage endpoints.
 
 ## Current release-candidate recheck (2026-10-21)
 
