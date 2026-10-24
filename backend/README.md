@@ -21,7 +21,7 @@ Tests use an isolated in-memory SQLite database and synthetic identity claims. T
 
 ## Configure and run
 
-Copy the repository-root `.env.example` to `backend/.env`; provide a PostgreSQL URL and values from an OIDC provider that supports an RS256 JWKS endpoint. No actual service names or credentials are configured. Then apply migrations and start the server:
+Copy the repository-root `.env.example` to `backend/.env`; set `DATABASE_URL` to the Supabase PostgreSQL URL in the commented example and keep the password local. Configure the documented OIDC issuer, audience, and JWKS URL after enabling RS256 signing in Supabase Auth. Then apply migrations and start the server:
 
 ```sh
 .venv/bin/alembic upgrade head

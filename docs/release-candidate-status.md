@@ -2,13 +2,14 @@
 
 ## Latest status (2026-10-24)
 
-- Review PR: [#1](https://github.com/spacedrift-in/briefcase-ios/pull/1), branch `codex/briefcase-release-readiness`, previously verified head `63debf9`. It is open for review; four GitHub checks passed on that head before the latest local API changes. Re-run CI on the updated commit before merge.
-- Linear: SPA-15 is Done with the core device walkthrough and PR link. SPA-13, SPA-14, and SPA-16 remain In Progress; see their issue notes for scope, validation, and acceptance gates.
-- The user approved the MVP defaults: PostgreSQL, private object storage, OIDC/RS256, Workspace Owner/Consultant upload, Client Reviewer comments/decisions, one final decision per immutable version, and PDF/images with version comments.
-- This update implements and tests project/version detail reads plus idempotent, reviewer-authorized version comments, included in audit export. Backend: 15 tests passed; Swift core: 15 tests passed; iOS 16 core package build passed; the PostgreSQL Alembic migration chain renders offline. Commit `8e2408d` is pushed to PR #1 and all four hosted checks passed; PR review remains open.
-- Remaining blockers: no existing OIDC/storage provider configuration was found; PostgreSQL availability is unverified; max upload size and audit export/retention authorization still need decisions. Upload/download routes and native sign-in are not implemented. Formal VoiceOver/Dynamic Type/usability and Instruments performance/crash profiling remain incomplete; product-owner release acceptance is not recorded.
+- Review PR: [#1](https://github.com/spacedrift-in/briefcase-ios/pull/1), branch `codex/briefcase-release-readiness`, current code head `3c9c2dd`. Four hosted checks passed on that head; documentation updates in this working tree still need a new CI run before merge.
+- Linear: SPA-15 is Done. SPA-13, SPA-14, and SPA-16 remain In Progress. Do not mark the latter complete until their remaining gates are verified.
+- The user approved PostgreSQL, private object storage, OIDC/RS256, Workspace Owner/Consultant upload, Client Reviewer comments/decisions, one final decision per immutable version, and PDF/images with version comments.
+- Current local verification: backend suite **15 passed**; Swift core suite **15 passed**. The `xcodebuild -list` check is blocked in this shell by unavailable CoreSimulatorService and denied writes to the user's Xcode log/DerivedData directories. Earlier hosted PR checks passed on `3c9c2dd`.
+- Supabase project `vetivgesigevfcolqpca` in Mumbai reports Healthy. The owner set its database password, but ignored `backend/.env` is absent in this checkout, so live PostgreSQL readiness and Alembic migrations have not run. Supabase Auth signing, private bucket, file routes, native sign-in, and a reachable API deployment remain unconfigured.
+- Remaining quality/release gates include maximum upload size, export/retention policy, real OIDC account and membership provisioning, upload/download behavior, full VoiceOver/Dynamic Type/usability review, Instruments profiling, current CI for doc updates, and explicit product-owner acceptance.
 
-**Checked:** 21 October 2026  
+**Checked:** 24 October 2026
 **Target acceptance date:** 10 November 2026  
 **Status:** Validation is in progress; explicit stakeholder acceptance has not been recorded.
 

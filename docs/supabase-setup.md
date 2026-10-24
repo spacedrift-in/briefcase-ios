@@ -9,11 +9,11 @@
 - Region: South Asia (Mumbai), `ap-south-1`
 - Creation settings: Free/Nano; Supabase Data API disabled; automatic RLS enabled.
 
-The dashboard currently reports the project as **Coming up** and shows an active technical-issue notice. Storage and Auth settings could not be applied while the project is provisioning. Check the [Supabase status page](https://status.supabase.com/) before retrying.
+On 24 October 2026, the dashboard reports the project as **Healthy**. A technical-issue notice remains visible in the dashboard; check the [Supabase status page](https://status.supabase.com/) if project operations fail. The database is available, but Supabase Auth signing and the private Storage bucket still need configuration.
 
 ## Database password handoff
 
-The database password generated during project creation was not recoverable from the browser after provisioning. Supabase does not show the existing password again. The owner must set/reset it directly in **Project Settings → Database**. Do not send it in chat. Store the replacement in the ignored local file `backend/.env` and URL-encode reserved characters in `DATABASE_URL`.
+The owner has set the database password in Supabase. It is not stored in this checkout: `backend/.env` is currently absent. Do not send the password in chat. Add the same password to the ignored local file `backend/.env` and URL-encode reserved characters in `DATABASE_URL` before running migrations.
 
 The connection uses the project database user `postgres` and database `postgres`. The direct endpoint is `db.vetivgesigevfcolqpca.supabase.co:5432`; if the eventual backend host is IPv4-only, copy the session-pooler connection string from Supabase's **Connect** panel instead of guessing its pooler host.
 
@@ -35,4 +35,4 @@ Create a private bucket named `deliverables` after provisioning completes. The c
 
 ## Database initialization
 
-Once the owner has set the password and the project is healthy, configure `backend/.env`, install the locked backend dependencies, apply Alembic migrations, and check `/health/ready`. The project has no application workspace memberships or sample records yet; real users will not see projects until authorized membership rows are provisioned.
+Once `backend/.env` contains the configured password, install the locked backend dependencies, apply Alembic migrations, and check `/health/ready`. The project has no application workspace memberships or sample records yet; real users will not see projects until authorized membership rows are provisioned.
