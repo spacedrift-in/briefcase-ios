@@ -91,8 +91,39 @@ public struct ApprovalAPIClient: Sendable {
         try await send(path: "api/v1/projects", method: "GET", body: Optional<EmptyBody>.none)
     }
 
+    public func project(projectID: UUID) async throws -> ProjectSummary {
+        try await send(path: "api/v1/projects/\(projectID.uuidString)", method: "GET", body: Optional<EmptyBody>.none)
+    }
+
     public func timeline(projectID: UUID) async throws -> [VersionSummary] {
         try await send(path: "api/v1/projects/\(projectID.uuidString)/timeline", method: "GET", body: Optional<EmptyBody>.none)
+    }
+
+    public func version(versionID: UUID) async throws -> VersionSummary {
+        try await send(path: "api/v1/versions/\(versionID.uuidString)", method: "GET", body: Optional<EmptyBody>.none)
+    }
+
+    public func comments(versionID: UUID) async throws -> [VersionCommentResponse] {
+        try await send(path: "api/v1/versions/\(versionID.uuidString)/comments", method: "GET", body: Optional<EmptyBody>.none)
+    }
+
+    /// Reuse the same idempotency key after an uncertain result so one logical
+    /// user action cannot create duplicate comments.
+    public func addComment(versionID: UUID, body: String, idempotencyKey: UUID) async throws -> VersionCommentResponse {
+        let url = try makeURL("api/v1/versions/\(versionID.uuidString)/comments")
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue(idempotencyKey.uuidString, forHTTPHeaderField: "Idempotency-Key")
+        request.httpBody = try Self.makeEncoder().encode(CommentPayload(body: body))
+
+        do {
+            return try await execute(request, mutation: true)
+        } catch let error as ApprovalAPIError {
+            throw error
+        } catch {
+            throw ApprovalAPIError.outcomeUncertain
+        }
     }
 
     public func audit(projectID: UUID) async throws -> [AuditRecord] {
@@ -213,6 +244,10 @@ public struct ApprovalAPIClient: Sendable {
 private struct DecisionPayload: Encodable {
     let action: String
     let comment: String?
+}
+
+private struct CommentPayload: Encodable {
+    let body: String
 }
 
 private struct EmptyBody: Encodable {}

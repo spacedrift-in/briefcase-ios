@@ -18,8 +18,17 @@ from spacedrift_api.models import (
     ProjectMembership,
     ReviewDecision,
     WorkspaceMembership,
+    VersionComment,
 )
-from spacedrift_api.schemas import AuditRecord, DecisionRequest, DecisionResponse, ProjectSummary, VersionSummary
+from spacedrift_api.schemas import (
+    AuditRecord,
+    CommentRequest,
+    CommentResponse,
+    DecisionRequest,
+    DecisionResponse,
+    ProjectSummary,
+    VersionSummary,
+)
 
 router = APIRouter(prefix="/api/v1")
 
@@ -49,6 +58,42 @@ def _member_project(session: Session, project_id: UUID, subject: str) -> tuple[P
     return row[0], row[1]
 
 
+def _member_version(session: Session, version_id: UUID, subject: str) -> tuple[DeliverableVersion, Project, str]:
+    context = session.execute(
+        select(DeliverableVersion, Project.id)
+        .join(Deliverable, Deliverable.id == DeliverableVersion.deliverable_id)
+        .join(Project, Project.id == Deliverable.project_id)
+        .where(DeliverableVersion.id == version_id)
+    ).first()
+    if context is None:
+        raise HTTPException(status_code=404, detail="version_not_found")
+    version, project_id = context
+    try:
+        project, role = _member_project(session, project_id, subject)
+    except HTTPException as exc:
+        if exc.status_code == 404:
+            raise HTTPException(status_code=404, detail="version_not_found") from exc
+        raise
+    return version, project, role
+
+
+def _version_summary(session: Session, version: DeliverableVersion) -> VersionSummary:
+    decision = session.scalar(select(ReviewDecision.action).where(ReviewDecision.version_id == version.id))
+    return VersionSummary(
+        id=version.id,
+        deliverable_id=version.deliverable_id,
+        version_number=version.version_number,
+        media_type=version.media_type,
+        byte_size=version.byte_size,
+        author_subject=version.author_subject,
+        created_at=version.created_at,
+        review_status={
+            "approve": "approved",
+            "request_changes": "changes_requested",
+        }.get(decision, "awaiting_review"),
+    )
+
+
 @router.get("/projects", response_model=list[ProjectSummary])
 def list_projects(
     claims: dict[str, Any] = Depends(current_identity),
@@ -70,6 +115,16 @@ def list_projects(
     return [ProjectSummary(id=p.id, name=p.name, summary=p.summary) for p in rows]
 
 
+@router.get("/projects/{project_id}", response_model=ProjectSummary)
+def project_detail(
+    project_id: UUID,
+    claims: dict[str, Any] = Depends(current_identity),
+    session: Session = Depends(get_session),
+) -> ProjectSummary:
+    project, _ = _member_project(session, project_id, _subject(claims))
+    return ProjectSummary(id=project.id, name=project.name, summary=project.summary)
+
+
 @router.get("/projects/{project_id}/timeline", response_model=list[VersionSummary])
 def project_timeline(
     project_id: UUID,
@@ -84,6 +139,7 @@ def project_timeline(
         .where(Deliverable.project_id == project_id)
         .order_by(DeliverableVersion.created_at.desc())
     ).all()
+    # The join above returns the decision in `action`; avoid per-row lookups.
     return [
         VersionSummary(
             id=version.id,
@@ -93,13 +149,93 @@ def project_timeline(
             byte_size=version.byte_size,
             author_subject=version.author_subject,
             created_at=version.created_at,
-            review_status={
-                "approve": "approved",
-                "request_changes": "changes_requested",
-            }.get(action, "awaiting_review"),
+            review_status={"approve": "approved", "request_changes": "changes_requested"}.get(
+                action, "awaiting_review"
+            ),
         )
         for version, action in rows
     ]
+
+
+@router.get("/versions/{version_id}", response_model=VersionSummary)
+def version_detail(
+    version_id: UUID,
+    claims: dict[str, Any] = Depends(current_identity),
+    session: Session = Depends(get_session),
+) -> VersionSummary:
+    version, _, _ = _member_version(session, version_id, _subject(claims))
+    return _version_summary(session, version)
+
+
+@router.get("/versions/{version_id}/comments", response_model=list[CommentResponse])
+def list_version_comments(
+    version_id: UUID,
+    claims: dict[str, Any] = Depends(current_identity),
+    session: Session = Depends(get_session),
+) -> list[VersionComment]:
+    _member_version(session, version_id, _subject(claims))
+    return list(
+        session.scalars(
+            select(VersionComment)
+            .where(VersionComment.version_id == version_id)
+            .order_by(VersionComment.created_at, VersionComment.id)
+        )
+    )
+
+
+@router.post(
+    "/versions/{version_id}/comments",
+    response_model=CommentResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def add_version_comment(
+    version_id: UUID,
+    request: CommentRequest,
+    claims: dict[str, Any] = Depends(current_identity),
+    session: Session = Depends(get_session),
+    idempotency_key: UUID = Header(alias="Idempotency-Key"),
+) -> VersionComment:
+    subject = _subject(claims)
+    _, _, role = _member_version(session, version_id, subject)
+    if role != "client_reviewer":
+        raise HTTPException(status_code=403, detail="comment_not_permitted")
+    body = request.body.strip()
+    if not body:
+        raise HTTPException(status_code=422, detail="comment_required")
+
+    prior = session.scalar(
+        select(VersionComment).where(
+            VersionComment.actor_subject == subject,
+            VersionComment.idempotency_key == idempotency_key,
+        )
+    )
+    if prior is not None:
+        if prior.version_id == version_id and prior.body == body:
+            return prior
+        raise HTTPException(status_code=409, detail="idempotency_key_reused")
+
+    comment = VersionComment(
+        version_id=version_id,
+        actor_subject=subject,
+        body=body,
+        idempotency_key=idempotency_key,
+    )
+    try:
+        session.add(comment)
+        session.commit()
+    except IntegrityError as exc:
+        session.rollback()
+        prior = session.scalar(
+            select(VersionComment).where(
+                VersionComment.actor_subject == subject,
+                VersionComment.idempotency_key == idempotency_key,
+            )
+        )
+        if prior is not None and prior.version_id == version_id and prior.body == body:
+            return prior
+        raise HTTPException(status_code=409, detail="idempotency_key_reused") from exc
+    session.refresh(comment)
+    return comment
 
 
 @router.post(
@@ -216,6 +352,25 @@ def export_audit(
         )
         for event, decision in rows
     ]
+    comments = session.execute(
+        select(VersionComment)
+        .join(DeliverableVersion, DeliverableVersion.id == VersionComment.version_id)
+        .join(Deliverable, Deliverable.id == DeliverableVersion.deliverable_id)
+        .where(Deliverable.project_id == project.id)
+    ).scalars()
+    records.extend(
+        AuditRecord(
+            event_id=comment.id,
+            decision_id=None,
+            version_id=comment.version_id,
+            actor_subject=comment.actor_subject,
+            action="comment",
+            comment=comment.body,
+            created_at=comment.created_at,
+        )
+        for comment in comments
+    )
+    records.sort(key=lambda record: (record.created_at, record.event_id.hex))
     if format == "json":
         return records
 

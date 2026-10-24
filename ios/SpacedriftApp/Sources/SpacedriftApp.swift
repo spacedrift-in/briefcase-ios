@@ -170,7 +170,8 @@ private enum StudioStyle {
     static let surfaceMuted = Color(red: 0.944, green: 0.930, blue: 0.900)
     static let ink = Color(red: 0.145, green: 0.137, blue: 0.176)
     static let secondaryInk = Color(red: 0.424, green: 0.412, blue: 0.455)
-    static let tertiaryInk = Color(red: 0.565, green: 0.545, blue: 0.576)
+    // Keep the smallest metadata labels above WCAG AA contrast on paper, surface, and muted cards.
+    static let tertiaryInk = Color(red: 0.424, green: 0.412, blue: 0.455)
     static let separator = Color(red: 0.875, green: 0.855, blue: 0.816)
     static let indigo = Color(red: 0.302, green: 0.267, blue: 0.620)
     static let indigoWash = Color(red: 0.922, green: 0.910, blue: 0.980)
@@ -303,6 +304,7 @@ private struct DemoRoleMenu: View {
             .overlay(Capsule().stroke(StudioStyle.separator.opacity(0.8), lineWidth: 1))
         }
         .accessibilityLabel("Demo account: \(store.role.rawValue). Change account")
+        .accessibilityIdentifier("demo-role-menu")
     }
 }
 
@@ -412,6 +414,7 @@ private struct StatusPill: View {
         .padding(.vertical, 6)
         .background(wash, in: Capsule())
         .accessibilityLabel("Review status: \(title)")
+        .accessibilityIdentifier("review-status-\(title.lowercased().replacingOccurrences(of: " ", with: "-"))")
     }
 }
 
@@ -649,6 +652,7 @@ struct ProjectListView: View {
                         ProjectFeature(project: store.project, outstandingCount: outstandingCount)
                     }
                     .buttonStyle(StudioLinkStyle())
+                    .accessibilityIdentifier("project-northstar")
 
                     NavigationLink { ProjectDetailView(project: store.project) } label: {
                         HStack(spacing: 6) {
@@ -662,6 +666,7 @@ struct ProjectListView: View {
                         .contentShape(Rectangle())
                     }
                     .buttonStyle(StudioLinkStyle())
+                    .accessibilityIdentifier("project-overview")
 
                     VStack(alignment: .leading, spacing: 11) {
                         SectionTitle(title: "Deliverables", detail: "Newest first")
@@ -671,6 +676,7 @@ struct ProjectListView: View {
                                     DeliverableVersionRow(version: version)
                                 }
                                 .buttonStyle(StudioLinkStyle())
+                                .accessibilityIdentifier("version-\(version.number)")
                                 if index < store.versions.count - 1 {
                                     Rectangle().fill(StudioStyle.separator.opacity(0.65))
                                         .frame(height: 1)
@@ -789,6 +795,7 @@ private struct RestrictedProjectRow: View {
             NavigationLink(value: project) { rowLabel }
                 .buttonStyle(StudioLinkStyle())
                 .accessibilityHint("Opens the consultant demo project")
+                .accessibilityIdentifier("restricted-project")
         } else {
             Button {
                 store.notice = "Access denied · this demo account is not a member of this project."
@@ -798,6 +805,7 @@ private struct RestrictedProjectRow: View {
             .buttonStyle(.plain)
             .buttonStyle(StudioLinkStyle())
             .accessibilityHint("Shows access denied for this account")
+            .accessibilityIdentifier("restricted-project")
         }
     }
 
@@ -901,6 +909,7 @@ struct ProjectDetailView: View {
                         }
                         .buttonStyle(StudioButtonStyle(tone: .secondary))
                         .accessibilityHint("Creates a local version record. No file is uploaded.")
+                        .accessibilityIdentifier("create-synthetic-revision")
                     }
 
                     VStack(alignment: .leading, spacing: 12) {
@@ -925,6 +934,7 @@ struct ProjectDetailView: View {
                         }
                         .buttonStyle(.plain)
                         .buttonStyle(StudioLinkStyle())
+                        .accessibilityIdentifier("audit-history")
                     }
                 }
                 .padding(.horizontal, StudioStyle.pageInset)
@@ -1193,11 +1203,13 @@ struct VersionDetailView: View {
                     .minimumScaleFactor(0.78)
             }
             .buttonStyle(StudioButtonStyle(tone: .secondary))
+            .accessibilityIdentifier("request-changes")
             Button { model.isApprovalConfirmationPresented = true } label: {
                 Label("Approve", systemImage: "checkmark")
                     .lineLimit(1)
             }
             .buttonStyle(StudioButtonStyle(tone: .primary))
+            .accessibilityIdentifier("approve-version")
         }
         .padding(.horizontal, StudioStyle.pageInset)
         .padding(.top, 9)
@@ -1370,6 +1382,7 @@ private struct FeedbackSheet: View {
                             .background(StudioStyle.surface, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
                             .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).stroke(StudioStyle.separator.opacity(0.75), lineWidth: 1))
                             .accessibilityLabel("Feedback for Version \(versionNumber)")
+                            .accessibilityIdentifier("feedback-version-\(versionNumber)")
                         HStack {
                             Text(trimmedComment.isEmpty ? "A comment is required to request changes." : "Clear feedback helps the next revision.")
                                 .font(.caption)
@@ -1401,6 +1414,7 @@ private struct FeedbackSheet: View {
                 Label("Send request for Version \(versionNumber)", systemImage: "arrow.up.right")
             }
             .buttonStyle(StudioButtonStyle(tone: .primary))
+            .accessibilityIdentifier("submit-feedback")
             .disabled(!isValid)
             .accessibilityHint(isValid ? "Saves this feedback to the local demo record." : "Enter a comment of 1 to 4,000 characters to enable this action.")
             .padding(.horizontal, StudioStyle.pageInset)

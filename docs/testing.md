@@ -1,5 +1,31 @@
 # Testing and validation
 
+## Supabase integration recheck (2026-10-24)
+
+- Supabase Auth was rotated to an RSA-2048 current signing key. The published JWKS endpoint was opened and returned the current RS256 RSA key plus the previous ECC key. Previous signing keys were not revoked.
+- The `deliverables` bucket is private and allows PDF/JPEG/PNG/HEIC up to 25 MB. It has no client access policies; there are still no backend file routes.
+- The local ignored `backend/.env` now has OIDC issuer/audience/JWKS values and the public Supabase URL/bucket configuration. The database password remains unchanged and is not printed or committed.
+- Live `/health/ready` returned **200** `{"status":"ready"}` using the Supabase PostgreSQL connection. This verifies database reachability only; it does not verify protected API auth or an iOS session.
+- Current rerun: backend suite **15 passed**; Swift core suite **15 passed**; the core package built for `arm64-apple-ios16.0`. Direct `xcodebuild -list` remains blocked by a mismatched CoreSimulator framework and inability to write Xcode package caches in this shell.
+
+## Current release-candidate recheck (2026-10-24)
+
+- Added authorized project/version detail reads and idempotent version-comment routes, with denied cross-project access and reviewer-role checks covered by backend tests.
+- `backend` suite: 15 tests passed using the Python 3.13 environment available from the workspace snapshot. It uses SQLite and synthetic identity claims; PostgreSQL and live OIDC remain unverified.
+- `ios/SpacedriftCore` suite: 15 tests passed, including authenticated idempotent comment submission and audit export records whose comments do not have decision IDs. This compiles and tests the client library on macOS; it does not run the iOS app.
+- Commit `8e2408d` is pushed to PR #1; all four hosted checks passed on that commit (iOS and Backend on push and pull_request).
+- Supabase PostgreSQL is reachable and migrated. RS256 signing and the private 25 MB Storage bucket are configured, but no application user/membership is provisioned, the iOS app has no native session provider, and the API has no deployment URL or storage endpoints.
+
+## Current release-candidate recheck (2026-10-21)
+
+Follow-up on branch `codex/briefcase-release-readiness` at docs-only commit `5151d10`: `xcodebuild` successfully compiled and linked the app for generic iOS device and generic iOS Simulator destinations with signing disabled when run outside the restricted shell. The Swift core suite passed **13 tests, 0 failures** and the backend suite passed **12 tests, 0 failures**. On the paired iPhone 16, the full synthetic approval walkthrough was exercised: Version 1 change request, consultant-created Version 2, client approval of that exact version, local audit inspection, and restricted-project denial. Force-quit and relaunch returned to the initial Client/Version 1 pending state, confirming that demo state is in-memory and not persistent. CoreSimulatorService is unavailable, so no simulator runtime workflow could be run.
+
+The base checkout was `main` at `cec8db235c7bf912e918f59d4b20290f90f681e3`, clean before this review. The Swift core suite passed **13 tests, 0 failures** with the documented per-command sandbox option; the backend suite passed **12 tests, 0 failures**. The app and core sources passed an iOS 16 target type-check against the installed iOS 27 SDK. The core package resolved without external dependencies and built for `arm64-apple-ios16.0`.
+
+Both hosted workflows are green for that exact base SHA: [iOS run 38774565079](https://github.com/spacedrift-in/briefcase-ios/actions/runs/38774565079) ran the generic iOS app build and core tests; [Backend run 38774564990](https://github.com/spacedrift-in/briefcase-ios/actions/runs/38774564990) installed the lockfile and ran pytest. They predate this review's changes; no run or PR exists for the local branch yet. There is no separate RC tag.
+
+The restricted-shell Xcode device/Simulator builds still fail before compilation at SwiftPM manifest diagnostics with `Operation not permitted`; successful generic builds were run outside that shell without changing project security settings. After the latest accessibility color adjustment, generic device and Simulator builds passed again, and a signed device build installed and launched on iPhone 16. The tertiary metadata color now has computed contrast of at least 4.60:1 against the app's paper, surface, and muted card backgrounds. This color-token calculation and visual check do not replace a VoiceOver/Dynamic Type accessibility review. CoreSimulatorService is unavailable. Instruments App Launch profiling was retried and again timed out waiting for the device to boot. See [release-candidate status](release-candidate-status.md) for the full scope and remaining gates.
+
 ## Backend connectivity milestone (2026-10-15)
 
 - `ios/SpacedriftCore` tests passed **13 tests, 0 failures**, including seven new API client/configuration tests for health success, typed project decoding, missing auth, HTTP 503, malformed JSON, connection failure, and invalid URLs. The tests used SwiftPM's supported per-command `--disable-sandbox` flag and scratch/module caches under `/private/tmp`.
@@ -93,7 +119,7 @@ env SWIFTC_DISABLE_SANDBOX=1 \
     -I work/CoreModules ios/SpacedriftApp/Sources/SpacedriftApp.swift
 ```
 
-The package module used in this check was emitted from the four existing core source files with `swiftc` for `arm64-apple-ios16.0`. This checks SwiftUI source/type availability but is not a full Xcode app build or link. CoreSimulator still cannot connect, and no simulator runtime was discovered. Docker cannot connect to its daemon, so PostgreSQL migration execution and database integration tests remain blocked. CI workflows have not run successfully.
+The package module used in this check was emitted from the four existing core source files with `swiftc` for `arm64-apple-ios16.0`. This checks SwiftUI source/type availability but is not a full Xcode app build or link. CoreSimulator still cannot connect, and no simulator runtime was discovered. Docker cannot connect to its daemon, so PostgreSQL migration execution and database integration tests remain blocked. At the time of this historical check, CI had not run successfully; current exact-commit CI evidence is in the section above.
 
 ## Planned coverage
 

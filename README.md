@@ -12,8 +12,8 @@ Discovery and architecture are documented in [`docs/architecture.md`](docs/archi
 - CoreSimulator could not connect; no available simulator runtimes were discovered.
 - Python 3.13.16 is installed.
 - Docker CLI 29.8.1 is installed, but its daemon socket is unavailable.
-- `psql` and `linear` commands were not found.
-- This directory is not a Git checkout. No files existed here before this discovery.
+- `psql` is not installed.
+- The verified checkout is `main` at `cec8db235c7bf912e918f59d4b20290f90f681e3`; see [release-candidate status](docs/release-candidate-status.md).
 
 ## Documentation
 
@@ -25,15 +25,17 @@ Discovery and architecture are documented in [`docs/architecture.md`](docs/archi
 - [API contract proposal](docs/api-contract.md)
 - [Security principles](docs/security.md)
 - [Testing plan and verified commands](docs/testing.md)
+- [Release-candidate verification status](docs/release-candidate-status.md)
 - [Backend setup](backend/README.md)
+- [Supabase project setup and remaining handoffs](docs/supabase-setup.md)
 
-The target acceptance date in the brief is 10 November 2026, a planning target only. Effort and delivery confidence should be estimated after product decisions, access, and a runnable foundation are available.
+The target acceptance date in the brief is 10 November 2026, a planning target only. Current verification, Linear status, and remaining release gates are tracked in [release-candidate status](docs/release-candidate-status.md).
 
 ## Current code and validation
 
 - [`ios/SpacedriftApp`](ios/SpacedriftApp) contains the iOS 16+ SwiftUI target and local fixture walkthrough. The target links the local `SpacedriftCore` Swift package.
 - [`ios/SpacedriftCore`](ios/SpacedriftCore) contains domain rules, the URLSession API client, the read-only Core Data cache, and XCTest coverage.
-- The core suite passed 6 tests on macOS 14 with the documented SwiftPM cache workaround. App source syntax parsing passed. The Xcode app build did not complete: package manifest resolution is blocked by the current host's SwiftPM/Xcode sandbox and cache permissions. This does not verify a simulator build or launch.
+- The core suite passed 13 tests on macOS 14 with SwiftPM's per-command sandbox workaround. The app and core sources passed an iOS 16 target type-check. The local Xcode build remains blocked at package resolution by host sandbox/cache restrictions; hosted iOS and backend CI passed for base commit `cec8db2`. Simulator and device launch have not been verified. No CI run or PR exists yet for the local release-readiness branch; see the [verification status](docs/release-candidate-status.md).
 - The sandbox flag is required because this host cannot apply SwiftPM's subprocess sandbox. See [testing notes](docs/testing.md).
 - `cd backend && .venv/bin/python -m pytest` passed 12 tests on Python 3.13.16 using isolated SQLite fixtures. PostgreSQL integration and migrations have not been executed against a database.
 - [iOS demo walkthrough and build command](docs/demo.md)

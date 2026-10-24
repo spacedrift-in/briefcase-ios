@@ -62,6 +62,22 @@ public struct DecisionResponse: Codable, Equatable, Sendable {
     }
 }
 
+public struct VersionCommentResponse: Codable, Identifiable, Equatable, Sendable {
+    public let id: UUID
+    public let versionID: UUID
+    public let actorSubject: String
+    public let body: String
+    public let createdAt: Date
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case versionID = "version_id"
+        case actorSubject = "actor_subject"
+        case body
+        case createdAt = "created_at"
+    }
+}
+
 public enum DecisionAction: String, Codable, Sendable {
     case requestChanges = "request_changes"
     case approve
@@ -69,7 +85,7 @@ public enum DecisionAction: String, Codable, Sendable {
 
 public struct AuditRecord: Codable, Identifiable, Equatable, Sendable {
     public let eventID: UUID
-    public let decisionID: UUID
+    public let decisionID: UUID?
     public let versionID: UUID
     public let actorSubject: String
     public let action: String
